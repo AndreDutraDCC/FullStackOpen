@@ -12,21 +12,24 @@ const App = () => {
     'The only way to go fast, is to go well.'
   ]
    
-  const [selected, setSelected] = useState(-1)
-
-  const default_message = "Press the button below to see an anecdote"
-  const anecdote = (selected === -1)? default_message : anecdotes[selected]
-
-  const button_text = (selected === -1)? "anecdote" : "next anecdote"
+  const [selected, setSelected] = useState(0)
+  const [votes, setVotes] = useState([0,0,0,0,0,0,0,0])
 
   const randint = (min, max) => min + Math.floor(Math.random() * (max - min))
-  
-  const selectRandomAnecdote = () => setSelected(randint(0, anecdotes.length))
+
+  const handleNextAnecdote = () => setSelected(randint(0, anecdotes.length))
+  const handleVote = () => {
+    const newVotes = [...votes]
+    newVotes[selected] += 1
+    setVotes(newVotes)
+  }
 
   return (
     <div>
-      <p>{anecdote}</p>
-      <button onClick={selectRandomAnecdote}>{button_text}</button>
+      <p>{anecdotes[selected]}</p>
+      <p>has {votes[selected]} votes</p>
+      <button onClick={handleVote}>{"vote"}</button>
+      <button onClick={handleNextAnecdote}>{"next anecdote"}</button>
     </div>
   )
 }
