@@ -1,6 +1,10 @@
 import { useState } from 'react'
 
-const Statistics = ({good, bad, neutral}) => {
+const Statistics = ({good, neutral, bad}) => {
+  if(good === 0 && neutral === 0 && bad === 0){
+    return <p>No feedback given</p>
+  }
+  
   const all = good + bad + neutral
   const avg = (good - bad)/all
   const pos = good/all
