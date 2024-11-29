@@ -35,7 +35,6 @@ const App = () => {
       <button onClick={handleNextAnecdote}>next anecdote</button>
       <h2>Anecdote with most votes</h2>
       <p>{anecdotes[max_anecdote]}</p>
-
     </div>
   )
 }
