@@ -27,7 +27,8 @@ const Total = ({parts}) => {
 const Course = ({ course }) => (
   <div>
     <Header name={course.name} />
-    <Content parts={course.parts}/>  
+    <Content parts={course.parts}/>
+    <Total parts={course.parts}/>  
   </div>
 )
 
@@ -50,7 +51,7 @@ const App = () => {
         name: 'State of a component',
         exercises: 14,
         id: 3
-      }
+      },
     ]
   }
 
