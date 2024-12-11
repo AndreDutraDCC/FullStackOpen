@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
 
-const Persons = ({persons}) => (
+const Person = ({person, handleDelete}) => (
+  <p>
+    {person.name} {person.number} <button onClick={handleDelete}>delete</button>
+  </p>
+)
+
+const Persons = ({persons, handleDelete}) => (
   <div>
-    {persons.map(person => <p key={person.name}>{person.name} {person.number}</p>)}
+    {persons.map(person => <Person key={person.id} person={person} handleDelete={() => handleDelete(person.id)}/>)}
   </div>
 )
 
@@ -78,6 +84,25 @@ const App = () => {
     setNameQuerry(event.target.value)
   }
 
+  const handleDelete = personId => {
+    const personToDelete = persons.find(p => p.id === personId)
+    if(!personToDelete){
+      alert(`Person of id ${personId} doesn't exist locally`)
+      //personToDelete = {name:`ID:${personId}`}
+    }
+    
+    if(confirm(`Delete ${personToDelete.name}?`)){
+      personService
+        .delete(personId)
+        .then(returnedPerson => {
+          setPersons(persons.filter(p => p.id !== personId))
+        })
+        .catch(error => {
+          alert(`Person of id ${personId} doesn't exist in the database`)
+        })
+    }
+  }
+
   const personsToShow = persons.filter((person) => {
     const lowerName = person.name.toLowerCase()
     const lowerQuerry = nameQuerry.toLowerCase()
@@ -98,7 +123,7 @@ const App = () => {
         handleSubmit={handlePerson}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsToShow}/>
+      <Persons persons={personsToShow} handleDelete={handleDelete}/>
     </div>
   )
 }
