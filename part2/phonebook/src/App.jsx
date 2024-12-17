@@ -43,8 +43,8 @@ const App = () => {
   const [nameQuerry, setNameQuerry] = useState('')
   const [notification, setNotification] = useState(null)
 
-  const notify = (message) => {
-    setNotification(message)
+  const notify = (message, color='green') => {
+    setNotification({message, color})
     setTimeout(() => {
       setNotification(null)
     }, 5000)
@@ -74,10 +74,13 @@ const App = () => {
             setPersons(persons.map(p => p.name === newName? returnedPerson : p))
             notify(`Updated ${newName}'s number`)
           })
+          .catch(error => {
+            notify(`Information of ${newName} has already been removed from server`, 'red')
+          })
       }
     }
     else if(persons.some(person => person.number === newNumber)){
-      alert(`${newNumber} is already added to phonebook`)
+      notify(`Number ${newNumber} is already added to phonebook`, 'red')
     }
     else{
       personService
@@ -107,7 +110,7 @@ const App = () => {
   const handleDelete = personId => {
     const personToDelete = persons.find(p => p.id === personId)
     if(!personToDelete){
-      alert(`Person of id ${personId} doesn't exist locally`)
+      notify(`Person of id ${personId} doesn't exist locally`, 'red')
       //personToDelete = {name:`ID:${personId}`}
     }
     
@@ -118,7 +121,7 @@ const App = () => {
           setPersons(persons.filter(p => p.id !== personId))
         })
         .catch(error => {
-          alert(`Person of id ${personId} doesn't exist in the database`)
+          notify(`Person of id ${personId} doesn't exist in the database`, 'red')
         })
     }
   }
@@ -133,7 +136,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification}/>
+      <Notification notification={notification}/>
       <SearchFilter querry={nameQuerry} handleQuerry={handleNameQuerry}/>
       <h2>add a new</h2>
       <PersonForm
