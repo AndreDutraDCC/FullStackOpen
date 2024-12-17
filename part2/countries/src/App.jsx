@@ -21,15 +21,20 @@ const SingleCountryData = ({country}) => {
   )
 }
 
-const CountryData = ({countries}) => {
-  if (countries.length > 10) {
+const CountryData = ({countries, selectedCountry, handleShow}) => {
+  if (selectedCountry !== null) {
+    return <SingleCountryData country={selectedCountry}/>
+  }
+  else if (countries.length > 10) {
     return <p>Too many matches, specify another filter</p>
   }
-  else if (countries.length == 1) {
-    return <SingleCountryData country={countries[0]}/>
-  }
   else {
-    return countries.map(country => <p key={country.name.common}>{country.name.common}</p>)
+    return countries.map(country => (
+      <p key={country.name.common}>
+        {country.name.common}
+        <button onClick={handleShow(country)}>show</button>
+      </p>
+    ))
   }
 }
 
@@ -37,6 +42,7 @@ const App = () => {
   const [querry, setQuerry] = useState('')
   const [countries, setCountries] = useState([])
   const [allCountries, setAllCountries] = useState([])
+  const [selectedCountry, setSelectedCountry] = useState(null)
 
   useEffect(()=> {
     axios
@@ -48,20 +54,25 @@ const App = () => {
 
   const onQuerryChange = event => {
     const newQuerry = event.target.value
+    const newCountries = allCountries.filter(country => {
+      if (!newQuerry){return false}
+      const countryLC =  country.name.common.toLowerCase()
+      const querryLC = newQuerry.toLowerCase()
+      return countryLC.includes(querryLC)
+    })
     setQuerry(newQuerry)
-    setCountries(allCountries
-      .filter(country => {
-        if (!newQuerry){return false}
-        const countryLC =  country.name.common.toLowerCase()
-        const querryLC = newQuerry.toLowerCase()
-        return countryLC.includes(querryLC)})
-    )
+    setCountries(newCountries)
+    setSelectedCountry(newCountries.length == 1 ? newCountries[0] : null)
+  }
+
+  const handleShow = country => () => {
+    setSelectedCountry(country)
   }
   
   return (
     <div>
         find countries<input value={querry} onChange={onQuerryChange}/>
-      <CountryData countries={countries}/>
+      <CountryData countries={countries} selectedCountry={selectedCountry} handleShow={handleShow}/>
     </div>
   )
 }
