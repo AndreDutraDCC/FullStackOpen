@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react'
+
+import Notification from './components/Notification'
+
 import personService from './services/persons'
 
 const Person = ({person, handleDelete}) => (
@@ -38,6 +41,14 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [nameQuerry, setNameQuerry] = useState('')
+  const [notification, setNotification] = useState(null)
+
+  const notify = (message) => {
+    setNotification(message)
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  }
 
   useEffect(() => {
     personService.getAll()
@@ -61,6 +72,7 @@ const App = () => {
           .update(personToUpdate.id, {...personToUpdate, number:newNumber})
           .then(returnedPerson => {
             setPersons(persons.map(p => p.name === newName? returnedPerson : p))
+            notify(`Updated ${newName}'s number`)
           })
       }
     }
@@ -72,6 +84,7 @@ const App = () => {
         .create(newPerson)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
+          notify(`Added ${newPerson.name}`)
         })
     }
     
@@ -120,6 +133,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification}/>
       <SearchFilter querry={nameQuerry} handleQuerry={handleNameQuerry}/>
       <h2>add a new</h2>
       <PersonForm
