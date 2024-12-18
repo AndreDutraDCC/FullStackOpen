@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 import axios from 'axios'
 
-const weatherApiKey = ''
+const weatherApiKey = ""
 
 const Weather = ({country, weather}) => {
   if (weather === null) return null
