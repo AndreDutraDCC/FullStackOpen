@@ -2,8 +2,27 @@ import { useState, useEffect } from 'react'
 
 import axios from 'axios'
 
+const weatherApiKey = ''
+
+const Weather = ({country, weather}) => {
+  if (weather === null) return null
+  const style = {width: 100, height:'auto'}
+  if (country === null) return null
+  else{
+    console.log(weather.icon)
+    return (
+      <div>
+        <h3>Weather in {country.name.common}</h3>
+        <p>temperature {weather.temperature} Celsius</p>
+        <img src={weather.icon} alt={weather.alt} style={style}/>
+        <p>wind {weather.windSpeed} m/s</p>
+      </div>
+    )
+  }
+  
+}
+
 const SingleCountryData = ({country}) => {
-  //const [lat, lng] = country.latlng
   const langs = Object.values(country.languages)
   const flagStyle = {width: 200, height:'auto'}
   
@@ -43,6 +62,7 @@ const App = () => {
   const [countries, setCountries] = useState([])
   const [allCountries, setAllCountries] = useState([])
   const [selectedCountry, setSelectedCountry] = useState(null)
+  const [selectedWeather, setSelectedWeather] = useState(null)
 
   useEffect(()=> {
     axios
@@ -51,6 +71,33 @@ const App = () => {
         setAllCountries(response.data)
       })
   }, [])
+
+  useEffect(() => {
+    if (selectedCountry === null) {
+      setSelectedWeather(null)
+    }
+    else {
+      const baseUrl = 'https://api.openweathermap.org/data/3.0/onecall'
+      const exclude = 'hourly,daily,minutely,alerts'
+      const [lat, lon] = selectedCountry.latlng
+      const appid = weatherApiKey
+      const units = 'metric'
+      axios
+        .get(baseUrl, {params: {lat, lon, exclude, appid, units}})
+        .then(response => {
+          console.log(response.data)
+          const iconCode = response.data.current.weather[0].icon
+          const newWeather = {
+            temperature: response.data.current.temp,
+            windSpeed: response.data.current.wind_speed,
+            icon: `https://openweathermap.org/img/wn/${iconCode}@2x.png`,
+            alt: response.data.current.weather[0].description
+          }
+          setSelectedWeather(newWeather)
+        })
+    }
+
+  }, [selectedCountry])
 
   const onQuerryChange = event => {
     const newQuerry = event.target.value
@@ -73,6 +120,7 @@ const App = () => {
     <div>
         find countries<input value={querry} onChange={onQuerryChange}/>
       <CountryData countries={countries} selectedCountry={selectedCountry} handleShow={handleShow}/>
+      <Weather country={selectedCountry} weather={selectedWeather}/>
     </div>
   )
 }
