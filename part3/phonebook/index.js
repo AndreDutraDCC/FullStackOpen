@@ -56,6 +56,20 @@ app.delete('/api/persons/:id', (request, response) => {
 app.post('/api/persons/', (request, response) => {
   const body = request.body
 
+  if(!body.name){
+    response.status(400).json({
+      error: 'name attribute is missing'
+    })
+  } else if(!body.number){
+    response.status(400).json({
+      error: 'number attribute is missing'
+    })
+  } else if (persons.some(person => person.name === body.name)) {
+    response.status(400).json({
+      error: 'name must be unique'
+    })
+  }
+
   const person = {
     id: String(Math.floor(Math.random() * 1000000)),
     name: body.name,
