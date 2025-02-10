@@ -12,7 +12,8 @@ const requestLogger = () => (request, response, next) => {
 
 app.use(cors())  
 app.use(express.json())
-app.use(requestLogger())
+app.use(express.static('dist'))
+//app.use(requestLogger())
 
 const generateId = () => {
     const maxId = notes.length > 0
@@ -64,6 +65,27 @@ app.delete('/api/notes/:id', (request, response) => {
     notes = notes.filter(note => note.id !== id)
 
     response.status(204).end()
+})
+
+app.put('/api/notes/:id', (request, response) => {
+    const id = request.params.id
+    const body = request.body
+
+    const note = notes.find(note => note.id === id)
+
+    if(note){
+        newNote = {
+            id: id,
+            important: "important" in body? Boolean(body.important) : note.important,
+            content: "content" in body? body.content : note.content
+        }
+        notes = notes.filter(note => note.id !== id).concat(newNote)
+        
+        response.json(newNote)
+    } else {
+        response.status(404).end()
+    }
+
 })
 
 app.post('/api/notes', (request, response) => {
