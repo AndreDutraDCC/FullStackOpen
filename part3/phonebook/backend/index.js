@@ -58,17 +58,22 @@ app.get('/api/info', (request, response) => {
 app.get('/api/persons/:id', (request, response) => {
   Person.findById(request.params.id)
     .then(person => {
-      response.json(person)
+      if (person){
+        response.json(person)
+      } else {
+        response.status(404).end()
+      }
     })
-    .catch(result => {
-      response.status(404).end()
+    .catch(error => {
+      console.log(error)
+      response.status(500).end()
     })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  const id = request.params.id
-  persons = persons.filter(person => person.id !== id)
-  response.status(204).end()
+  Person.findByIdAndDelete(request.params.id).then(result => {
+    response.status(204).end()
+  })
 })
 
 app.post('/api/persons/', (request, response) => {
@@ -96,7 +101,7 @@ app.post('/api/persons/', (request, response) => {
   person.save().then(returnedPerson => {
     response.json(returnedPerson)
   })
-  
+
 })
 
 const PORT = process.env.PORT
