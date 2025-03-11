@@ -75,8 +75,7 @@ const App = () => {
             notify(`Updated ${newName}'s number`)
           })
           .catch(error => {
-            notify(`Information of ${newName} has already been removed from server`, 'red')
-          })
+            notify(error.response.data.error, 'red')})
       }
     }
     else if(persons.some(person => person.number === newNumber)){
@@ -89,6 +88,8 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           notify(`Added ${newPerson.name}`)
         })
+        .catch(error => {
+          notify(error.response.data.error, 'red')})
     }
     
     setNewName('')
